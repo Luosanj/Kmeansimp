@@ -2,7 +2,7 @@
 ----
 ## Overview
 * This package is an improved version of standard kmeans clustering which is Lloyd algorithm. The main improved part is initial centroids sampling. 
-* Standard sampling method is to randomly select k points( k is number od clusters) as initial centroids. Yet this way usually converges too slow. The improved 
+* Standard sampling method is to randomly select k points( k is number of clusters) as initial centroids. Yet this way usually converges too slow. The improved 
 version has 3 steps:
    * Step 1: From all objects randomly select one. 
    * Step 2: select next initial centroids from n-objects in such a way that the Euclidean distance
