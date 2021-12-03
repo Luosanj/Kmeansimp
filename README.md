@@ -9,7 +9,7 @@ version has 3 steps:
 of that object is maximum from other selected initial centroids.
    * Step 3: repeat step 2 until we get k initial centroids. <br>
  * From these steps we will get initial centroids and with these initial centroids to perform kMeans algorithm. <br>
- * You can learn more about them in *Tutorial.html* vignette folder.
+ * You can learn more about them in *Tutorial.html* in vignette folder.
 ----
 
 ## Backend
