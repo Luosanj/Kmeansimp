@@ -1,0 +1,141 @@
+---
+title: "Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+### Theoretical description
+  This package is an improved version of Lloyd kmeans clustering Standard sampling
+method is to randomly select k points( k cluster number) as initial centroids. 
+Yet this way usually converges too slow.The improved version has 3 steps:
+  
+  -  Step 1: From all objects randomly select one object as first centroid.
+  
+  -  Step 2: select next initial centroid from n-1 objects in such a way that the
+Euclidean distance of that object is maximum from other selected initial centroids.
+
+  -  Step 3: repeat step 2 until we get k initial centroids.
+  
+  The advantage of this method is that it takes less iteration times to converge comparing with initial 
+Lloyd algorithm.
+  
+### Rcpp description
+  This package includes 2 Rcpp internal functions acCtr() and doClus(), which are used to accelerate initial
+points sampling process and making clustering process. Main speed up point is for loop
+comparing with code only including R. It is more than 5 times faster.
+
+### Backend
+* The improvement idea is from [here](https://www.ijcsmc.com/docs/papers/July2013/V2I7201338.pdf) but including a change. Above step 1 of initial centroids sampling is different from articles. The article chooses average value of all sample points as first centroid but I randomly select first one. This change makes clustering result more robust since determining centroid point is truly a limitation when shape of data is far from average point.   
+
+## Usage
+  This function include 3 parameters : `data`, `n` and `iter`.
+  - `data` is the matrix/dataframe needed to be clustered. 
+  - `n` is the number of cluster.
+  - `iter` is maximum iteration times for updating clustering result and centroids.
+
+  If iteration times reach maximum value but clustering does not converge yet, then 
+a warning will rise up. This warning is made by myself rather than systematic ones. 
+For example: 'Warning in Kmeansimp(df, 2, 3) :Clustering did 
+not converge, more iterations are suggested!'
+
+  PS: Input `iter` is optional with default value 10. 
+  
+  The output of this package is a list containing follow terms: 
+  
+  -  `each_cluster_size`: sample size within each cluster from 1 to k.
+  
+  -  `Clustering Vector`: a vector provides which cluster each sample belongs to.
+  
+  -  `Cluster_means`: A matrix containing average of points in each cluster.
+  
+  -  `Within_cluster_sum_of_squares(withinSS)`: The number of between-sum-of-squares.
+  
+  -  `proportion of betweenSS with totalSS`: Proportion of between-sum-of-squares comparing total-sum-of-squares ,this index is the most crucial one to detect quality of clustering. The higher the proportion, the better clustering fit.
+  
+### Import package
+```{r setup}
+library(Kmeansimp)
+```
+
+### Run function
+```{r}
+df = matrix(c(1:100), 50, 2)
+Kmeansimp(df, 2, iter = 20) 
+```
+
+### Specific parts clustering result
+```{r}
+Kmeansimp(df, 2, iter = 20)$each_cluster_size # sample size within each cluster
+```
+
+```{r}
+Kmeansimp(df, 2, iter = 20)$Cluster_means # Cluster Means
+```
+
+```{r}
+Kmeansimp(df, 2, iter = 20)$Clustering_Vector # Cluster results of all sample points
+```
+
+```{r}
+Kmeansimp(df, 2, iter = 20)$`Within_cluster_sum_of_squares(withinSS)`
+```
+
+```{r}
+Kmeansimp(df, 2, iter = 20)$`proportion of betweenSS with totalSS`
+```
+
+### Warning case, larger iteration times need !
+```{r}
+df_1 = matrix(c(1:100), 50, 2)
+Kmeansimp(df_1, 2, iter = 2)
+```
+
+## Comparison efficiency with R basic package `kmeans()`
+  This package is 5 times faster when doing whole kmeans clustering with mere R code. Yet, this package is still lower than `kmeans()` `because `kmeans()` is an interal package in r but is completely realized by c++ code. I use RCpp to accelerate first initial centroid sampling in this method and updating centroids process because these processes need iterating all samples, which cost a lot of time if just use for loop in R. 
+  
+   To prove correctness of  my package, I use `bench` package with *bench::mark* method because if this method can run successfully, then result is correct.
+ 
+  Since `Kmeans` is an unsupervised methodology with randomness. Clustering result cannot be completely the same in big data cases. So I use an index 'proportion of between sum of squares with total sum of squares' to check correctness, because although clustering result cannot always be the same, but centroids of clustering should be in similar place and clustering distribution should be very similar generally. If this index is the same, that means clustering results are distributed almost equal. So this index can be proved for correctness. For more accurate correctness proof, I do unit testing, which you can see 
+  
+  Yet in *bench::mark* method, it treats unused parameters and steps as garbage. But actually they are not because the output of 'kmeans' method cannot only include the index I mentioned, but also should include all other information in my output. If you know 'kmeans', you can get my idea. So the running time comparison in this part I think is not as persuasive as running time in second part when using library `rbenchmark` with *benchmark* method, which shows running time of while process.
+
+### 1. Simulated data 
+  PS: I use several `runif` to generate data because methods like `kmeans` are useful when data distribution is not centered or very uniform. So I generate data by partitions.
+  
+  I simulate a dataset with 300 thousand samples which are all 2 dimensioned. From the result, method *bench::mark* runs suucessfully which can prove correctness.
+  
+```{r}
+library(bench)
+df = matrix(c(runif(300000, 0, 10),runif(300000, 8, 18)), 300000, 2, byrow = TRUE)
+bench::mark(kimp = round(Kmeansimp(df, 2, iter = 20)$`proportion of betweenSS with totalSS`, 2), 
+            kt = round(kmeans(df, 2, 20, algorithm = 'Lloyd')$betweenss / 
+                       kmeans(df, 2, 20, algorithm = 'Lloyd')$totss, 2),
+                       filter_gc = FALSE)
+```
+### 2. Actual dataset
+  This part I use internal dataset 'mtcars' in R to test efficiency. The result is shown below.
+Due to randomness, when sample size is small, the proportion of between sum of squares and total 
+sum of squares will not be fixed. So this part *benchmark* is well suited.
+  
+  From result, efficiency of my package is lower than internal 'kmeans' package in R. But if all details 
+are accelerated by Cpp. Efficiency will be similar.
+```{r}
+library(rbenchmark)
+mtcar = data(mtcars)
+kimp = round(Kmeansimp(mtcars, 2)$`proportion of betweenSS with totalSS`, 2)
+kt = round(kmeans(mtcars, 2, algorithm = 'Lloyd')$betweenss / 
+                  kmeans(mtcars, 2, algorithm = 'Lloyd')$totss, 2)
+cat('proportion of betweenSS with totalSS in Kmeamsimp is: ', kimp, '\n')
+cat('proportion of betweenSS with totalSS in kmeams is: ', kt)
+benchmark(Kmeansimp(mtcars, 2, iter = 10), kmeans(mtcars, 2, algorithm = 'Lloyd', 10))
+```

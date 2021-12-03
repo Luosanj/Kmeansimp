@@ -83,3 +83,10 @@ $`Within_cluster_sum_of_squares(withinSS)`
 $`proportion of betweenSS with totalSS`
 [1] 0.96
 ```
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Luosanj/Kmeansimp/workflows/R-CMD-check/badge.svg)](https://github.com/Luosanj/Kmeansimp/actions)
+
+[![codecov](https://codecov.io/gh/Luosanj/Kmeansimp/branch/main/graph/badge.svg?token=B2ZEYVV1YW)](https://codecov.io/gh/Luosanj/Kmeansimp)
+<!-- badges: end -->
+
