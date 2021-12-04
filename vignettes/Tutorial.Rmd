@@ -113,7 +113,14 @@ Kmeansimp(df_1, 2, iter = 2)
   PS: I use several `runif` to generate data because methods like `kmeans` are useful when data distribution is not centered or very uniform. So I generate data by partitions.
   
   I simulate a dataset with 300 thousand samples which are all 2 dimensioned. From the result, method *bench::mark* runs suucessfully which can prove correctness.
-  
+```{r}
+library(bench)
+df = matrix(c(runif(300000, 0, 10),runif(300000, 8, 18)), 300000, 2, byrow = TRUE)
+bench::mark(kimp = round(Kmeansimp(df, 2, iter = 20)$`proportion of betweenSS with totalSS`, 2), 
+            kt = round(kmeans(df, 2, 20, algorithm = 'Lloyd')$betweenss / 
+                         kmeans(df, 2, 20, algorithm = 'Lloyd')$totss, 2),
+            filter_gc = FALSE)
+``` 
 
 ### 2. Actual dataset
   This part I use internal dataset 'mtcars' in R to test efficiency. The result is shown below.

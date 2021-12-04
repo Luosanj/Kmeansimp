@@ -27,19 +27,19 @@
 #' clu$Clustering_Vector
 Kmeansimp = function(data, n, iter = 10){
   # Kmeans algorithm is 'Lloyd'
-  if(!is.matrix(data) && !is.data.frame(data)){
-    stop('Input dataset must be a dataframe or matrix !')
-  }
-  if(!(n == round(n)) || n < 1L){
-    stop('Number of clusters must be a positive integer!')
-  }
-  size = nrow(data)
-  if(n >= size){
-    stop('Number of clusters must be above 0 and below sample size !')
-  }
-  if(n == 1L){
-    warning('1 cluster is the dataset itself!')
-  }
+  #if(!is.matrix(data) && !is.data.frame(data)){
+  #  stop('Input dataset must be a dataframe or matrix !')
+  #}
+  #if(!(n == round(n)) || n < 1L){
+  #  stop('Number of clusters must be a positive integer!')
+  #}
+  #size = nrow(data)
+  #if(n >= size){
+  #  stop('Number of clusters must be above 0 and below sample size !')
+  #}
+  #if(n == 1L){
+  #  warning('1 cluster is the dataset itself!')
+  #}
   
   dataset = as.matrix(data)
   maxiter = iter
@@ -81,9 +81,9 @@ Kmeansimp = function(data, n, iter = 10){
     }
     numiter = numiter + 1L
   }
-  if(!flag){
-    warning('Clustering did not converge, more iterations are suggested!')
-  }
+  #if(!flag){
+  #  warning('Clustering did not converge, more iterations are suggested!')
+  #}
   
   # count number of each cluster
   sizeVec = c()
