@@ -1,4 +1,9 @@
 # Kmeansimp
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/Luosanj/Kmeansimp/workflows/R-CMD-check/badge.svg)](https://github.com/Luosanj/Kmeansimp/actions)
+
+[![codecov](https://codecov.io/gh/Luosanj/Kmeansimp/branch/main/graph/badge.svg?token=B2ZEYVV1YW)](https://codecov.io/gh/Luosanj/Kmeansimp)
+<!-- badges: end -->
 ----
 ## Overview
 * This package is an improved version of standard kmeans clustering which is Lloyd algorithm. The main improved part is initial centroids sampling. 
@@ -84,9 +89,5 @@ $`proportion of betweenSS with totalSS`
 [1] 0.96
 ```
 
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/Luosanj/Kmeansimp/workflows/R-CMD-check/badge.svg)](https://github.com/Luosanj/Kmeansimp/actions)
 
-[![codecov](https://codecov.io/gh/Luosanj/Kmeansimp/branch/main/graph/badge.svg?token=B2ZEYVV1YW)](https://codecov.io/gh/Luosanj/Kmeansimp)
-<!-- badges: end -->
 
