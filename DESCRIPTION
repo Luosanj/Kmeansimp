@@ -12,6 +12,8 @@ LinkingTo: Rcpp
 RoxygenNote: 7.1.2
 Encoding: UTF-8
 Suggests: 
+    bench,
+    rbenchmark,
     rmarkdown,
     knitr,
     testthat (>= 3.0.0)
